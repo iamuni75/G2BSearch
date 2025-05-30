@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 from G2B_Search import G2B_search_by_keywords, preG2B_search_by_keywords
 from Tools import markdown_to_excel
 
@@ -9,6 +10,7 @@ from Tools import markdown_to_excel
 st.set_page_config(layout="wide")
 
 st.title("나라장터(G2B) 검색")
+# st.markdown("> 하나의 검색어 마다 날짜 기준으로 최대 20개 까지 검색됩니다.")
 # st.markdown("---")
 search_status = st.empty()
 
@@ -46,7 +48,7 @@ with st.sidebar:
             st.session_state[option] = True
 
     # 검색날짜 설정. 기본값은 어제 일자로 설정
-    search_date = st.date_input("검색일", date.today() - timedelta(days=1))
+    search_date = st.date_input("검색 시작일", date.today() - timedelta(days=1), min_value=date.today() - relativedelta(months=1))
     input_keywords = st.text_input("추가 검색어 입력", placeholder="검색어가 여러개면 콤마(,)로 구분")
 
     if st.button("🔍G2B 검색", use_container_width=True, key="search1"):
@@ -70,14 +72,15 @@ with st.sidebar:
         # 본공고 검색 결과를 처리
         g2b_search_result = G2B_search_by_keywords(search_keywords, search_date, callback=progress_callback)
         if g2b_search_result != None:   # 검색 결과가 있을 경우
-            st.session_state["main_searched_list_md"] = g2b_search_result["main_searched_list_md"]
+            st.session_state["main_searched_list_md"] = g2b_search_result["searched_list_md"]
             st.session_state["main_searched_list_count"] = g2b_search_result["total_count"]
 
         preG2b_search_result = preG2B_search_by_keywords(search_keywords, search_date, callback=progress_callback)
         if preG2b_search_result != None:   # 검색 결과가 있을 경우
-            st.session_state["pre_searched_list_md"] = preG2b_search_result["main_searched_list_md"]
+            st.session_state["pre_searched_list_md"] = preG2b_search_result["searched_list_md"]
             st.session_state["pre_searched_list_count"] = preG2b_search_result["total_count"]
 
+    st.caption("❗️키워드 당 최대 50개씩 검색됨")
     st.markdown("---")
     st.text("검색어 선택")
     # 버튼클릭 시 세션스테이트 전부 변경

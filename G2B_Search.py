@@ -2,7 +2,7 @@ import requests
 from datetime import date, datetime
 
 
-# 검색 키워드를 기반으로 G2B 본공고 검색하기
+# 검색 키워드를 기반으로 G2B 입찰공고 검색하기
 def G2B_search_by_keywords(search_keywords: list, begin_date: date, callback=None) -> dict:
     
     # 검색 키워드가 없으면 종료
@@ -12,10 +12,11 @@ def G2B_search_by_keywords(search_keywords: list, begin_date: date, callback=Non
     params = {        
         "serviceKey": "MVoTD2rvZNfyUqlB1iwYk4FiSi6jR2jcVP4ZKUI+u6HKiyXcraeAVhSLBbsjSuDpfmScCy6R7bU3CcOP6ormdA==",             # 디코딩
         "pageNo": 1,      # 검색 결과 페이지 번호
-        "numOfRows": 20,  # 페이지당 항목 수
+        "numOfRows": 50,  # 페이지당 항목 수
         "type": "json",     # 검색결과 표현 방식
         "inqryDiv": 1,      # 조회구분(1:공고게시일시, 2:개찰일시)
         "inqryBgnDt": begin_date.strftime("%Y%m%d") + "0000",      # 검색시작날짜
+        "inqryEndDt": datetime.now().strftime("%Y%m%d%H%M"),    # 검색종료날짜(현재 시간)
     }
 
     searched_list = []
@@ -30,7 +31,7 @@ def G2B_search_by_keywords(search_keywords: list, begin_date: date, callback=Non
 
             response = requests.get(url, params=params)
 
-            if response.ok:
+            if response.ok:                
                 searched_result = response.json()  # JSON 형태 응답 파싱
                 searched_result_items = collect_item_info(keyword, searched_result)
                 
@@ -43,7 +44,7 @@ def G2B_search_by_keywords(search_keywords: list, begin_date: date, callback=Non
     
     searched_result = {}
     searched_result["total_count"] = len(searched_list)
-    searched_result["main_searched_list_md"] = dict_to_md(searched_list)
+    searched_result["searched_list_md"] = dict_to_md(searched_list)
     return searched_result
 
 
@@ -63,16 +64,18 @@ def collect_item_info(search_keyword: str, g2b_searched: dict) -> list:
         item_info["입찰공고명"] = item["bidNtceNm"]
         
         # 추정가격은 천단위 콤마와 '원'을 붙여서 텍스트로 저장
-        item_price = int(item["presmptPrce"])
+        item_price = int(item["asignBdgtAmt"])
         item_price_unit = f"{item_price:,}원"
-        item_info["추정가격"] = item_price_unit
+        item_info["배정예산금액"] = item_price_unit
         
         item_info["공고기관"] = item["ntceInsttNm"]
         item_info["수요기관"] = item["dminsttNm"]
+        item_info["지역제한여부"] = item["cmmnSpldmdCorpRgnLmtYn"]
         item_info["입찰공고번호"] = item["bidNtceNo"]
         item_info["입찰방식"] = item["bidMethdNm"]
         item_info["계약체결방법"] = item["cntrctCnclsMthdNm"]
         item_info["용역구분"] = item["srvceDivNm"]
+        item_info["낙찰방법"] = item["sucsfbidMthdNm"]
         item_info["입찰공고상세URL"] = item["bidNtceDtlUrl"]
         
         item_info_selected_list.append(item_info)
@@ -84,7 +87,7 @@ def collect_item_info(search_keyword: str, g2b_searched: dict) -> list:
 def dict_to_md(searched_items: list) -> str:
     
     # 마크다운 표 만들기
-    headers = ["검색어", "입찰공고일시", "입찰마감일시", "입찰공고명", "추정가격", "공고기관", "수요기관", "입찰공고번호", "입찰방식", "계약체결방법", "용역구분", "입찰공고상세URL"]
+    headers = ["검색어", "입찰공고일시", "입찰마감일시", "입찰공고명", "배정예산금액", "공고기관", "수요기관", "지역제한여부", "입찰공고번호", "입찰방식", "계약체결방법", "용역구분", "낙찰방법", "입찰공고상세URL"]
     header_row = "| " + " | ".join(headers) + " |"
     separator_row = "| " + " | ".join(["---"] * len(headers)) + " |"
 
@@ -122,7 +125,7 @@ def preG2B_search_by_keywords(search_keywords: list, begin_date: date, callback=
     params = {        
         "serviceKey": "MVoTD2rvZNfyUqlB1iwYk4FiSi6jR2jcVP4ZKUI+u6HKiyXcraeAVhSLBbsjSuDpfmScCy6R7bU3CcOP6ormdA==",             # 디코딩
         "pageNo": 1,      # 검색 결과 페이지 번호
-        "numOfRows": 20,  # 페이지당 항목 수
+        "numOfRows": 50,  # 페이지당 항목 수
         "type": "json",     # 검색결과 표현 방식
         "inqryDiv": 1,      # 조회구분(1:접수일시)
         "inqryBgnDt": begin_date.strftime("%Y%m%d") + "0000",   # 검색시작날짜
@@ -154,7 +157,7 @@ def preG2B_search_by_keywords(search_keywords: list, begin_date: date, callback=
     
     searched_result = {}
     searched_result["total_count"] = len(searched_list)
-    searched_result["main_searched_list_md"] = preDict_to_md(searched_list)
+    searched_result["searched_list_md"] = preDict_to_md(searched_list)
     return searched_result
 
 
