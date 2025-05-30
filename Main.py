@@ -117,7 +117,7 @@ with tab_pre:
     # 마크다운을 엑셀로 다운로드하기
     if st.session_state["pre_searched_list_md"] != "":
         excel_data = markdown_to_excel(st.session_state["pre_searched_list_md"])
-        st.download_button("엑셀 다운로드", data=excel_data, file_name="preG2b_search_result.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.download_button("📗엑셀 다운로드", data=excel_data, file_name="preG2b_search_result.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 with tab_main:
     st.subheader(f"✅ 검색결과({main_searched_count}건)")
