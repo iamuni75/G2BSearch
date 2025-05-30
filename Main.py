@@ -9,7 +9,7 @@ from Tools import markdown_to_excel
 
 st.set_page_config(layout="wide")
 
-st.title("나라장터(G2B) 검색")
+st.title("📝나라장터(G2B) 검색")
 # st.markdown("> 하나의 검색어 마다 날짜 기준으로 최대 20개 까지 검색됩니다.")
 # st.markdown("---")
 search_status = st.empty()
@@ -51,7 +51,7 @@ with st.sidebar:
     search_date = st.date_input("검색 시작일", date.today() - timedelta(days=1), min_value=date.today() - relativedelta(months=1))
     input_keywords = st.text_input("추가 검색어 입력", placeholder="검색어가 여러개면 콤마(,)로 구분")
 
-    if st.button("🔍G2B 검색", use_container_width=True, key="search1"):
+    if st.button("🔍 검색 시작", use_container_width=True, key="search1"):
         # 검색결과 세션 초기화
         st.session_state["main_searched_list_md"] = ""
         st.session_state["main_searched_list_count"] = 0
@@ -127,4 +127,4 @@ with tab_main:
     # 마크다운을 엑셀로 다운로드하기
     if st.session_state["main_searched_list_md"] != "":
         excel_data = markdown_to_excel(st.session_state["main_searched_list_md"])
-        st.download_button("엑셀 다운로드", data=excel_data, file_name="g2b_search_result.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.download_button("📗엑셀 다운로드", data=excel_data, file_name="g2b_search_result.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
