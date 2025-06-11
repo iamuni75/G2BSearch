@@ -109,6 +109,7 @@ main_searched_count = st.session_state['main_searched_list_count']
 pre_searched_count = st.session_state['pre_searched_list_count']
 tab_pre, tab_main = st.tabs([f"사전규격({pre_searched_count}건)", f"입찰공고({main_searched_count}건)"])
 
+# 사전규격탭 검색 결과
 with tab_pre:
     st.subheader(f"✅ 검색결과({pre_searched_count}건)")
     st.write(st.session_state["pre_searched_list_md"])
@@ -117,8 +118,9 @@ with tab_pre:
     # 마크다운을 엑셀로 다운로드하기
     if st.session_state["pre_searched_list_md"] != "":
         excel_data = markdown_to_excel(st.session_state["pre_searched_list_md"])
-        st.download_button("📗엑셀 다운로드", data=excel_data, file_name="preG2b_search_result.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.download_button("📗엑셀 다운로드", data=excel_data, file_name=f"preG2b_search_{date.today().strftime('%y%m%d')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
+# 본공고탭 검색 결과
 with tab_main:
     st.subheader(f"✅ 검색결과({main_searched_count}건)")
     st.write(st.session_state["main_searched_list_md"])
@@ -127,4 +129,4 @@ with tab_main:
     # 마크다운을 엑셀로 다운로드하기
     if st.session_state["main_searched_list_md"] != "":
         excel_data = markdown_to_excel(st.session_state["main_searched_list_md"])
-        st.download_button("📗엑셀 다운로드", data=excel_data, file_name="g2b_search_result.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.download_button("📗엑셀 다운로드", data=excel_data, file_name=f"g2b_search_{date.today().strftime('%y%m%d')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
